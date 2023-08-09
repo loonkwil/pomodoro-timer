@@ -56,7 +56,7 @@
       }
     }
 
-    @container style(--state: short-break) {
+    @container style(--state: break) {
       --progress-bar-thumb-position: 0;
       --bg: var(--blue);
       @media (prefers-color-scheme: dark) {
@@ -84,13 +84,9 @@
 
       position: relative;
       width: 100%;
+      margin: 0;
       appearance: none;
       background: transparent;
-
-      &:focus {
-        --progress-bar-stroke: var(--yellow);
-        outline: none;
-      }
 
       &::-webkit-slider-runnable-track {
         appearance: none;
@@ -131,7 +127,7 @@
           transparent calc(100% - var(--progress-bar-line-width)),
           var(--progress-bar-stroke) calc(100% - var(--progress-bar-line-width))
         );
-        background-size: 25%;
+        background-size: calc(100% / (var(--number-of-markers, 0) + 1));
       }
     }
   }
