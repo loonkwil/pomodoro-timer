@@ -1,7 +1,7 @@
-export function formatTime(ms: number): string {
+export function formatTime(sec: number): string {
   // 1970-01-01T00:02:00.000Z
   //               ^^^^^
-  return new Date(ms).toISOString().substring(14, 19);
+  return new Date(sec * 1_000).toISOString().substring(14, 19);
 }
 
 /**

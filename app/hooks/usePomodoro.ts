@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import useStopwatch from "@/app/hooks/useStopwatch";
 
 export default function usePomodoro({
@@ -9,10 +10,10 @@ export default function usePomodoro({
 }): {
   timeLeftFromCurrentSession: number;
   completedPomodoros: number;
-  setCompletedPomodoros: React.Dispatch<React.SetStateAction<number>>;
+  setCompletedPomodoros: (value: number) => void;
   type: "pomodoro" | "break";
   isPlaying: boolean;
-  setPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setPlaying: (isPlaying: boolean) => void;
 } {
   const { time, setTime, isPlaying, setPlaying } = useStopwatch(200);
 
@@ -36,13 +37,10 @@ export default function usePomodoro({
     setTime(0);
   }
 
-  function setCompletedPomodoros(valueOrFn: React.SetStateAction<number>) {
-    const value =
-      typeof valueOrFn === "function"
-        ? valueOrFn(completedPomodoros)
-        : valueOrFn;
-    setTime(value * cycleLength);
-  }
+  const setCompletedPomodoros = useCallback(
+    (value: number) => setTime(value * cycleLength),
+    [setTime, cycleLength],
+  );
 
   return {
     timeLeftFromCurrentSession,

@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useCallback } from "react";
 
 type State = {
   time: number;
@@ -36,9 +36,9 @@ function reducer(state: State, { type, payload }: Action): State {
 
 export default function useStopwatch(interval: number = 1_000): {
   time: number;
-  setTime: React.Dispatch<React.SetStateAction<number>>;
+  setTime: (time: number) => void;
   isPlaying: boolean;
-  setPlaying: React.Dispatch<React.SetStateAction<boolean>>;
+  setPlaying: (isPlaying: boolean) => void;
 } {
   const [state, dispatch] = useReducer(reducer, {
     time: 0,
@@ -46,29 +46,29 @@ export default function useStopwatch(interval: number = 1_000): {
     lastChecked: null,
   });
 
-  function setTime(valueOrFn: React.SetStateAction<number>) {
-    const time =
-      typeof valueOrFn === "function" ? valueOrFn(state.time) : valueOrFn;
-    dispatch({ type: "SET_TIME", payload: { time } });
-  }
+  const setTime = useCallback(
+    (time: number) => dispatch({ type: "SET_TIME", payload: { time } }),
+    [dispatch],
+  );
 
-  function setPlaying(valueOrFn: React.SetStateAction<boolean>) {
-    const isPlaying =
-      typeof valueOrFn === "function" ? valueOrFn(state.isPlaying) : valueOrFn;
-    dispatch({
-      type: "SET_PLAYING",
-      payload: { isPlaying, now: performance.now() },
-    });
-  }
+  const setPlaying = useCallback(
+    (isPlaying: boolean) =>
+      dispatch({
+        type: "SET_PLAYING",
+        payload: { isPlaying, now: performance.now() },
+      }),
+    [dispatch],
+  );
 
   useEffect(() => {
     if (!state.isPlaying) {
       return;
     }
 
-    const tick = setInterval(() => {
-      dispatch({ type: "TICK", payload: { now: performance.now() } });
-    }, interval);
+    const tick = setInterval(
+      () => dispatch({ type: "TICK", payload: { now: performance.now() } }),
+      interval,
+    );
 
     return () => clearInterval(tick);
   }, [state.isPlaying, interval]);

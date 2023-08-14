@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { roundNearest } from "@/app/lib/utils";
 
 export default function RangeInput({
@@ -5,6 +6,7 @@ export default function RangeInput({
   min = 0,
   max,
   step = 1,
+  precision = 0.001,
   numberOfMarkers = 0,
   onChange,
 }: {
@@ -12,52 +14,61 @@ export default function RangeInput({
   min?: number;
   max: number;
   step?: number;
+  precision?: number;
   numberOfMarkers: number;
   onChange: (value: number) => void;
 }) {
-  function handleInput(e: React.FormEvent<HTMLInputElement>): void {
-    const inputValue = parseFloat(e.currentTarget.value);
-    const nextValue = roundNearest(inputValue, step);
-    if (nextValue !== value) {
-      onChange(nextValue);
-    }
-  }
+  const roundedValue = roundNearest(value, precision);
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-    let nextValue = value;
-    switch (e.key) {
-      case "ArrowLeft":
-      case "ArrowDown": {
-        nextValue = roundNearest(nextValue, step);
-        if (nextValue >= value) {
-          nextValue -= step;
-        }
-        nextValue = Math.max(nextValue, min);
-        break;
+  const handleInput = useCallback(
+    (e: React.FormEvent<HTMLInputElement>): void => {
+      const inputValue = parseFloat(e.currentTarget.value);
+      const nextValue = roundNearest(inputValue, step);
+      if (nextValue !== roundedValue) {
+        onChange(nextValue);
       }
-      case "ArrowRight":
-      case "ArrowUp": {
-        nextValue = roundNearest(nextValue, step);
-        if (nextValue <= value) {
-          nextValue += step;
-        }
-        nextValue = Math.min(nextValue, max);
-        break;
-      }
-    }
+    },
+    [roundedValue, onChange, step],
+  );
 
-    if (nextValue !== value) {
-      onChange(nextValue);
-    }
-  }
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>): void => {
+      let nextValue = roundedValue;
+      switch (e.key) {
+        case "ArrowLeft":
+        case "ArrowDown": {
+          nextValue = roundNearest(nextValue, step);
+          if (nextValue >= roundedValue) {
+            nextValue -= step;
+          }
+          nextValue = Math.max(nextValue, min);
+          break;
+        }
+        case "ArrowRight":
+        case "ArrowUp": {
+          nextValue = roundNearest(nextValue, step);
+          if (nextValue <= roundedValue) {
+            nextValue += step;
+          }
+          nextValue = Math.min(nextValue, max);
+          break;
+        }
+      }
+
+      if (nextValue !== roundedValue) {
+        onChange(nextValue);
+      }
+    },
+    [roundedValue, onChange, min, max, step],
+  );
 
   return (
     <input
       type="range"
       min={min}
       max={max}
-      step={0.001}
-      value={value}
+      step={precision}
+      value={roundedValue}
       onKeyDown={handleKeyDown}
       onInput={handleInput}
       style={{ "--number-of-markers": numberOfMarkers } as React.CSSProperties}

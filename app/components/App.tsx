@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect } from "react";
 import Time from "@/app/components/Time";
 import RangeInput from "@/app/components/RangeInput";
@@ -36,11 +38,12 @@ export default function App({
     setPlaying,
   } = usePomodoro({ numberOfPomodoros, lengths });
   const state = isPlaying ? type : "paused";
+  const timeLeftInSec = Math.floor(timeLeftFromCurrentSession / 1_000);
 
   useEffect(() => {
-    const title = formatTime(timeLeftFromCurrentSession);
+    const title = formatTime(timeLeftInSec);
     document.title = title;
-  }, [timeLeftFromCurrentSession]);
+  }, [timeLeftInSec]);
 
   useEffect(() => {
     const $link = document.querySelector("link[rel='icon']");
@@ -68,9 +71,9 @@ export default function App({
         return;
       }
 
-      setPlaying((isPlaying) => !isPlaying);
+      setPlaying(!isPlaying);
     },
-    [setPlaying],
+    [isPlaying, setPlaying],
   );
 
   return (
@@ -80,7 +83,7 @@ export default function App({
       onClick={handleClick}
     >
       <div className="app">
-        <Time timeLeft={timeLeftFromCurrentSession} />
+        <Time timeLeft={timeLeftInSec} />
         <RangeInput
           onChange={handleChange}
           min={0}
