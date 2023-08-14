@@ -7,6 +7,7 @@ const fira = Fira_Mono({ subsets: ["latin"], weight: "700" });
 export const metadata: Metadata = {
   title: "Pomodoro Timer",
   description: "Simple app to track your pomodoro sessions.",
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
