@@ -3,18 +3,23 @@
 import { useCallback, useEffect } from "react";
 import Time from "@/app/components/Time";
 import RangeInput from "@/app/components/RangeInput";
+import AudioPlayer from "@/app/components/AudioPlayer";
 import usePomodoro from "@/app/hooks/usePomodoro";
+import type { Type } from "@/app/hooks/usePomodoro";
 import { formatTime } from "@/app/lib/utils";
 
-type State = "pomodoro" | "break" | "paused";
+const colors = {
+  pink: "#cf6955",
+  blue: "#058b8c",
+  yellow: "#ffdea9",
+};
 
-function generateSVGIndicator(state: State): string {
-  const colors = {
-    pomodoro: "#cf6955",
-    break: "#058b8c",
-    paused: "#ffdea9",
-  };
-  const color = colors[state];
+function generateSVGIndicator(type: Type, isPlaying: boolean): string {
+  let color = colors.yellow;
+  if (isPlaying) {
+    color = type === "pomodoro" ? colors.pink : colors.blue;
+  }
+
   return `
     <svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
       <circle cx="8" cy="8" r="4" fill="${color}"/>
@@ -37,7 +42,6 @@ export default function App({
     isPlaying,
     setPlaying,
   } = usePomodoro({ numberOfPomodoros, lengths });
-  const state = isPlaying ? type : "paused";
   const timeLeftInSec = Math.floor(timeLeftFromCurrentSession / 1_000);
 
   useEffect(() => {
@@ -48,13 +52,13 @@ export default function App({
   useEffect(() => {
     const $link = document.querySelector("link[rel='icon']");
     if ($link) {
-      const svg = generateSVGIndicator(state);
+      const svg = generateSVGIndicator(type, isPlaying);
       $link.setAttribute(
         "href",
         `data:image/svg+xml,${encodeURIComponent(svg)}`,
       );
     }
-  }, [state]);
+  }, [type, isPlaying]);
 
   const handleChange = useCallback(
     (value: number) => {
@@ -79,10 +83,14 @@ export default function App({
   return (
     <div
       className="app-container"
-      style={{ "--state": state } as React.CSSProperties}
+      style={{ "--state": isPlaying ? type : null } as React.CSSProperties}
       onClick={handleClick}
     >
       <div className="app">
+        <AudioPlayer
+          src="/audio/clock.mp3"
+          isPlaying={isPlaying && type === "pomodoro"}
+        />
         <Time timeLeft={timeLeftInSec} />
         <RangeInput
           onChange={handleChange}

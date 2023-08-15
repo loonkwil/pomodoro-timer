@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import useStopwatch from "@/app/hooks/useStopwatch";
 
+export type Type = "pomodoro" | "break";
+
 export default function usePomodoro({
   numberOfPomodoros,
   lengths,
@@ -11,7 +13,7 @@ export default function usePomodoro({
   timeLeftFromCurrentSession: number;
   completedPomodoros: number;
   setCompletedPomodoros: (value: number) => void;
-  type: "pomodoro" | "break";
+  type: Type;
   isPlaying: boolean;
   setPlaying: (isPlaying: boolean) => void;
 } {
