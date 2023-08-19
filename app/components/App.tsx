@@ -4,8 +4,7 @@ import { useCallback, useEffect } from "react";
 import Time from "@/app/components/Time";
 import RangeInput from "@/app/components/RangeInput";
 import AudioPlayer from "@/app/components/AudioPlayer";
-import usePomodoro from "@/app/hooks/usePomodoro";
-import useShortcut from "@/app/hooks/useShortcut";
+import { usePomodoro, useShortcut, useFavicon } from "@/app/hooks";
 import type { Type } from "@/app/hooks/usePomodoro";
 import { formatTime } from "@/app/lib/utils";
 
@@ -28,6 +27,10 @@ function generateSVGIndicator(type: Type, isPlaying: boolean): string {
   `;
 }
 
+function encodeSVG(svg: string): string {
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 export default function App({
   numberOfPomodoros,
   lengths,
@@ -45,27 +48,13 @@ export default function App({
   } = usePomodoro({ numberOfPomodoros, lengths });
   const timeLeftInSec = Math.floor(timeLeftFromCurrentSession / 1_000);
 
-  useEffect(
-    function updateDocumentTitle() {
-      const title = formatTime(timeLeftInSec);
-      document.title = title;
-    },
-    [timeLeftInSec],
-  );
+  useEffect(() => {
+    const title = formatTime(timeLeftInSec);
+    document.title = title;
+  }, [timeLeftInSec]);
 
-  useEffect(
-    function updateFavIcon() {
-      const $link = document.querySelector("link[rel='icon']");
-      if ($link) {
-        const svg = generateSVGIndicator(type, isPlaying);
-        $link.setAttribute(
-          "href",
-          `data:image/svg+xml,${encodeURIComponent(svg)}`,
-        );
-      }
-    },
-    [type, isPlaying],
-  );
+  const icon = encodeSVG(generateSVGIndicator(type, isPlaying));
+  useFavicon(icon);
 
   const handleInputChange = useCallback(
     (value: number) => {
