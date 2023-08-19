@@ -28,7 +28,7 @@ export default function AudioPlayer({
     $audio.setAttribute("src", src);
 
     if (isPlaying) {
-      $audio.play();
+      $audio.play().catch(() => {});
     } else {
       $audio.pause();
     }
