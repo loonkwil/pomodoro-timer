@@ -9,7 +9,7 @@ type State = {
 type Action =
   | { type: "TICK"; payload: { now: number } }
   | { type: "SET_TIME"; payload: { time: number } }
-  | { type: "SET_PLAYING"; payload: { isPlaying: boolean; now: number } };
+  | { type: "TOGGLE_PLAYING"; payload: { now: number } };
 
 function reducer(state: State, { type, payload }: Action): State {
   switch (type) {
@@ -23,9 +23,10 @@ function reducer(state: State, { type, payload }: Action): State {
       const { time } = payload;
       return { ...state, time, lastChecked: null, isPlaying: false };
     }
-    case "SET_PLAYING": {
-      const { isPlaying, now } = payload;
+    case "TOGGLE_PLAYING": {
+      const { now } = payload;
       const lastChecked = state.lastChecked ?? payload.now;
+      const isPlaying = !state.isPlaying;
       const time = isPlaying ? state.time : state.time + now - lastChecked;
       return { ...state, time, isPlaying, lastChecked: now };
     }
@@ -38,7 +39,7 @@ export default function useStopwatch(interval: number = 1_000): {
   time: number;
   setTime: (time: number) => void;
   isPlaying: boolean;
-  setPlaying: (isPlaying: boolean) => void;
+  togglePlaying: () => void;
 } {
   const [state, dispatch] = useReducer(reducer, {
     time: 0,
@@ -51,12 +52,9 @@ export default function useStopwatch(interval: number = 1_000): {
     [dispatch],
   );
 
-  const setPlaying = useCallback(
-    (isPlaying: boolean) =>
-      dispatch({
-        type: "SET_PLAYING",
-        payload: { isPlaying, now: performance.now() },
-      }),
+  const togglePlaying = useCallback(
+    () =>
+      dispatch({ type: "TOGGLE_PLAYING", payload: { now: performance.now() } }),
     [dispatch],
   );
 
@@ -73,5 +71,10 @@ export default function useStopwatch(interval: number = 1_000): {
     return () => clearInterval(tick);
   }, [state.isPlaying, interval]);
 
-  return { time: state.time, setTime, isPlaying: state.isPlaying, setPlaying };
+  return {
+    time: state.time,
+    setTime,
+    isPlaying: state.isPlaying,
+    togglePlaying,
+  };
 }

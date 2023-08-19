@@ -15,9 +15,9 @@ export default function usePomodoro({
   setCompletedPomodoros: (value: number) => void;
   type: Type;
   isPlaying: boolean;
-  setPlaying: (isPlaying: boolean) => void;
+  togglePlaying: () => void;
 } {
-  const { time, setTime, isPlaying, setPlaying } = useStopwatch(200);
+  const { time, setTime, isPlaying, togglePlaying } = useStopwatch(200);
 
   const cycleLength = lengths.pomodoro + lengths.break;
   const completedCycles = Math.floor(time / cycleLength);
@@ -50,6 +50,6 @@ export default function usePomodoro({
     setCompletedPomodoros,
     type,
     isPlaying,
-    setPlaying,
+    togglePlaying,
   };
 }

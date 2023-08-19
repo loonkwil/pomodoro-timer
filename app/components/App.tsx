@@ -40,7 +40,7 @@ export default function App({
     setCompletedPomodoros,
     type,
     isPlaying,
-    setPlaying,
+    togglePlaying,
   } = usePomodoro({ numberOfPomodoros, lengths });
   const timeLeftInSec = Math.floor(timeLeftFromCurrentSession / 1_000);
 
@@ -71,13 +71,11 @@ export default function App({
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
-      if ((e.target as HTMLElement).nodeName === "INPUT") {
-        return;
+      if ((e.target as HTMLElement).nodeName !== "INPUT") {
+        togglePlaying();
       }
-
-      setPlaying(!isPlaying);
     },
-    [isPlaying, setPlaying],
+    [togglePlaying],
   );
 
   return (
