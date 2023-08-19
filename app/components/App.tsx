@@ -5,6 +5,7 @@ import Time from "@/app/components/Time";
 import RangeInput from "@/app/components/RangeInput";
 import AudioPlayer from "@/app/components/AudioPlayer";
 import usePomodoro from "@/app/hooks/usePomodoro";
+import useShortcut from "@/app/hooks/useShortcut";
 import type { Type } from "@/app/hooks/usePomodoro";
 import { formatTime } from "@/app/lib/utils";
 
@@ -44,29 +45,41 @@ export default function App({
   } = usePomodoro({ numberOfPomodoros, lengths });
   const timeLeftInSec = Math.floor(timeLeftFromCurrentSession / 1_000);
 
-  useEffect(() => {
-    const title = formatTime(timeLeftInSec);
-    document.title = title;
-  }, [timeLeftInSec]);
+  useEffect(
+    function updateDocumentTitle() {
+      const title = formatTime(timeLeftInSec);
+      document.title = title;
+    },
+    [timeLeftInSec],
+  );
 
-  useEffect(() => {
-    const $link = document.querySelector("link[rel='icon']");
-    if ($link) {
-      const svg = generateSVGIndicator(type, isPlaying);
-      $link.setAttribute(
-        "href",
-        `data:image/svg+xml,${encodeURIComponent(svg)}`,
-      );
-    }
-  }, [type, isPlaying]);
+  useEffect(
+    function updateFavIcon() {
+      const $link = document.querySelector("link[rel='icon']");
+      if ($link) {
+        const svg = generateSVGIndicator(type, isPlaying);
+        $link.setAttribute(
+          "href",
+          `data:image/svg+xml,${encodeURIComponent(svg)}`,
+        );
+      }
+    },
+    [type, isPlaying],
+  );
 
-  const handleChange = useCallback(
+  const handleInputChange = useCallback(
     (value: number) => {
       if (value < numberOfPomodoros) {
         setCompletedPomodoros(value);
       }
     },
     [numberOfPomodoros, setCompletedPomodoros],
+  );
+
+  useShortcut(" ", togglePlaying);
+  useShortcut("Enter", togglePlaying);
+  useShortcut("Escape", () =>
+    setCompletedPomodoros(Math.floor(completedPomodoros)),
   );
 
   const handleClick = useCallback(
@@ -91,7 +104,7 @@ export default function App({
         />
         <Time timeLeft={timeLeftInSec} />
         <RangeInput
-          onChange={handleChange}
+          onChange={handleInputChange}
           min={0}
           max={numberOfPomodoros}
           step={1}
