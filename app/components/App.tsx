@@ -65,11 +65,11 @@ export default function App({
     [numberOfPomodoros, setCompletedPomodoros],
   );
 
-  useShortcut(" ", togglePlaying);
-  useShortcut("Enter", togglePlaying);
-  useShortcut("Escape", () =>
-    setCompletedPomodoros(Math.floor(completedPomodoros)),
-  );
+  useShortcut({
+    " ": togglePlaying,
+    Enter: togglePlaying,
+    Escape: () => setCompletedPomodoros(Math.floor(completedPomodoros)),
+  });
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {

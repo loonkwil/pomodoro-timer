@@ -1,12 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
-export default function useShortcut(
-  key: string,
-  cb: (e: KeyboardEvent) => void,
-) {
+type Callback = (e: KeyboardEvent) => void;
+type Shortcuts = { [key: string]: Callback };
+
+export default function useShortcut(shortcuts: Shortcuts) {
+  const ref = useRef<Shortcuts | null>(null);
+  ref.current = shortcuts;
+
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
-      if (key === e.key) {
+      const cb = ref.current?.[e.key] as Callback | undefined;
+      if (cb) {
         cb(e);
       }
     };
@@ -15,5 +19,5 @@ export default function useShortcut(
     return () => {
       window.removeEventListener("keydown", handler);
     };
-  }, [key, cb]);
+  }, []);
 }
