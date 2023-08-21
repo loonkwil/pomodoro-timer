@@ -56,6 +56,12 @@ export default function App({
   const icon = encodeSVG(generateSVGIndicator(type, isPlaying));
   useFavicon(icon);
 
+  useShortcut({
+    " ": togglePlaying,
+    Enter: togglePlaying,
+    Escape: () => setCompletedPomodoros(Math.floor(completedPomodoros)),
+  });
+
   const handleInputChange = useCallback(
     (value: number) => {
       if (value < numberOfPomodoros) {
@@ -64,12 +70,6 @@ export default function App({
     },
     [numberOfPomodoros, setCompletedPomodoros],
   );
-
-  useShortcut({
-    " ": togglePlaying,
-    Enter: togglePlaying,
-    Escape: () => setCompletedPomodoros(Math.floor(completedPomodoros)),
-  });
 
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLElement>) => {
@@ -81,26 +81,28 @@ export default function App({
   );
 
   return (
-    <div
-      className="app-container"
-      style={{ "--state": isPlaying ? type : null } as React.CSSProperties}
-      onClick={handleClick}
-    >
-      <div className="app">
-        <AudioPlayer
-          src="/audio/clock.mp3"
-          isPlaying={isPlaying && type === "pomodoro"}
-        />
-        <Time timeLeft={timeLeftInSec} />
-        <RangeInput
-          onChange={handleInputChange}
-          min={0}
-          max={numberOfPomodoros}
-          step={1}
-          numberOfMarkers={numberOfPomodoros - 1}
-          value={completedPomodoros}
-        />
+    <>
+      <AudioPlayer
+        src="/audio/clock.mp3"
+        isPlaying={isPlaying && type === "pomodoro"}
+      />
+      <div
+        className="app-container"
+        style={{ "--state": isPlaying ? type : null } as React.CSSProperties}
+        onClick={handleClick}
+      >
+        <div className="app">
+          <Time timeLeft={timeLeftInSec} />
+          <RangeInput
+            onChange={handleInputChange}
+            min={0}
+            max={numberOfPomodoros}
+            step={1}
+            numberOfMarkers={numberOfPomodoros - 1}
+            value={completedPomodoros}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

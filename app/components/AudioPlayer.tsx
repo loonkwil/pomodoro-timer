@@ -7,25 +7,13 @@ export default function AudioPlayer({
   src: string;
   isPlaying: boolean;
 }) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    const $audio = new Audio();
-    $audio.setAttribute("loop", "");
-    $audio.setAttribute("preload", "auto");
-
-    audioRef.current = $audio;
-
-    return () => $audio.pause();
-  }, []);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     const { current: $audio } = audioRef;
     if (!$audio) {
       return;
     }
-
-    $audio.setAttribute("src", src);
 
     if (isPlaying) {
       $audio.play().catch(() => {});
@@ -34,5 +22,5 @@ export default function AudioPlayer({
     }
   }, [src, isPlaying]);
 
-  return null;
+  return <audio src={src} loop preload="auto" ref={audioRef} />;
 }
