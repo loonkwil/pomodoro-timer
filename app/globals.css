@@ -79,55 +79,83 @@
     transition-duration: 200ms;
 
     & input[type="range"] {
-      --thumb-diameter: calc(var(--progress-bar-line-width) * 3);
-      --height: calc(18 * var(--progress-bar-line-width));
+      /* Aliases */
+      --line-width: var(--progress-bar-line-width);
+      --thumb-position: var(--progress-bar-thumb-position);
+      color: var(--progress-bar-stroke);
 
-      position: relative;
-      width: 100%;
-      margin: 0;
+      --height: calc(18 * var(--line-width));
+      --thumb-diameter: calc(3 * var(--line-width));
+      --thumb-up: calc(-1 * (var(--height) - var(--thumb-diameter)) / 2);
+      --thumb-down: calc(-1 * var(--thumb-up) - var(--line-width));
+      --thumb-translate-y: calc(
+        (var(--thumb-position) * var(--thumb-down)) -
+          ((var(--thumb-position) - 1) * var(--thumb-up))
+      );
+
       appearance: none;
-      background: transparent;
+      width: 100%;
+      height: var(--height);
+      margin: 0;
+      background: repeating-linear-gradient(
+          to right,
+          currentColor,
+          currentColor var(--line-width),
+          transparent var(--line-width),
+          transparent
+            calc((100% - var(--line-width)) / (var(--number-of-markers, 0) + 1))
+        ),
+        linear-gradient(
+          to top,
+          currentColor,
+          currentColor var(--line-width),
+          transparent var(--line-width)
+        ),
+        transparent;
+      background-position: calc((var(--thumb-diameter) - var(--line-width)) / 2)
+        bottom;
+      background-size: calc(100% - (var(--thumb-diameter) - var(--line-width)))
+        50%;
+      background-repeat: no-repeat;
+    }
 
-      &::-webkit-slider-runnable-track {
-        appearance: none;
-        height: var(--height);
+    /* Firefox */
+    @supports (selector(::-moz-range-thumb)) {
+      & input[type="range"] {
+        &::-moz-range-track {
+        }
+
+        &::-moz-range-progress {
+        }
+
+        &::-moz-range-thumb {
+          appearance: none;
+          width: var(--thumb-diameter);
+          height: var(--thumb-diameter);
+          border: none;
+          border-radius: 50%;
+          background: currentColor;
+          transition: translate 200ms;
+          translate: 0 var(--thumb-translate-y);
+        }
       }
+    }
 
-      &::-webkit-slider-thumb {
-        appearance: none;
-        width: var(--thumb-diameter);
-        height: var(--thumb-diameter);
-        border-radius: 50%;
-        background: var(--progress-bar-stroke);
-        transition: translate 200ms;
-        translate: 0
-          calc(
-            var(--progress-bar-thumb-position) *
-              (
-                var(--height) - var(--thumb-diameter) -
-                  var(--progress-bar-line-width)
-              )
-          );
-      }
+    /* Chromium-based browsers */
+    @supports (selector(::-webkit-slider-thumb)) {
+      & input[type="range"] {
+        &::-webkit-slider-runnable-track {
+        }
 
-      &:after {
-        content: "";
-        display: block flow;
-        position: absolute;
-        right: var(--progress-bar-line-width);
-        left: var(--progress-bar-line-width);
-        bottom: 0;
-        height: calc(var(--height) / 2);
-        border: var(--progress-bar-line-width) solid var(--progress-bar-stroke);
-        border-top: none;
-        border-right: none;
-        background-image: linear-gradient(
-          90deg,
-          transparent 0%,
-          transparent calc(100% - var(--progress-bar-line-width)),
-          var(--progress-bar-stroke) calc(100% - var(--progress-bar-line-width))
-        );
-        background-size: calc(100% / (var(--number-of-markers, 0) + 1));
+        &::-webkit-slider-thumb {
+          appearance: none;
+          width: var(--thumb-diameter);
+          height: var(--thumb-diameter);
+          border-radius: 50%;
+          background: currentColor;
+          transition: translate 200ms;
+          translate: 0 var(--thumb-translate-y);
+        }
       }
     }
   }
