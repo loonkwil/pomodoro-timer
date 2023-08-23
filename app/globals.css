@@ -21,11 +21,19 @@
 
   body {
     margin: 0;
-    height: 100dvh;
+
+    height: 100vh;
+    @supports (height: 100dvh) {
+      height: 100dvh;
+    }
   }
 }
 
 @layer styles {
+  .error-msg {
+    white-space: pre-wrap;
+  }
+
   .app-container {
     height: 100%;
     container-type: inline-size;
