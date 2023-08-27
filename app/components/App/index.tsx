@@ -1,12 +1,15 @@
 "use client";
 
 import { useCallback, useEffect } from "react";
-import Time from "@/app/components/Time";
-import RangeInput from "@/app/components/RangeInput";
-import AudioPlayer from "@/app/components/AudioPlayer";
+import Timer from "@/app/components/App/Timer";
+import AudioPlayer from "@/app/components/App/AudioPlayer";
 import { usePomodoro, useShortcut, useFavicon } from "@/app/hooks";
 import type { Type } from "@/app/hooks/usePomodoro";
 import { formatTime } from "@/app/lib/utils";
+import {
+  isCSSNestingSupported,
+  isCSSContainerQueriesSupported,
+} from "@/app/lib/featureDetection";
 
 const colors = {
   pink: "#cf6955",
@@ -38,6 +41,15 @@ export default function App({
   numberOfPomodoros: number;
   lengths: { pomodoro: number; break: number };
 }) {
+  useEffect(() => {
+    if (!isCSSNestingSupported() || !isCSSContainerQueriesSupported()) {
+      const msg =
+        "Your Browser is not Supported.\n" +
+        "Try to use a browser that supports modern CSS features like nesting, cascade layers, container style queries, media query range syntax (Chrome 112+).";
+      throw new Error(msg);
+    }
+  }, []);
+
   const {
     timeLeftFromCurrentSession,
     completedPomodoros,
@@ -81,28 +93,23 @@ export default function App({
   );
 
   return (
-    <>
+    <main
+      className="app"
+      style={{ "--state": isPlaying ? type : null } as React.CSSProperties}
+      onClick={handleClick}
+    >
       <AudioPlayer
         src="/audio/clock.mp3"
         isPlaying={isPlaying && type === "pomodoro"}
       />
-      <div
-        className="app-container"
-        style={{ "--state": isPlaying ? type : null } as React.CSSProperties}
-        onClick={handleClick}
-      >
-        <div className="app">
-          <Time timeLeft={timeLeftInSec} />
-          <RangeInput
-            onChange={handleInputChange}
-            min={0}
-            max={numberOfPomodoros}
-            step={1}
-            numberOfMarkers={numberOfPomodoros - 1}
-            value={completedPomodoros}
-          />
-        </div>
-      </div>
-    </>
+      <Timer
+        {...{
+          timeLeftInSec,
+          handleInputChange,
+          numberOfPomodoros,
+          completedPomodoros,
+        }}
+      />
+    </main>
   );
 }

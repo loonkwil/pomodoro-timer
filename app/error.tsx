@@ -2,9 +2,9 @@
 
 export default function Error({ error }: { error: Error }) {
   return (
-    <>
+    <article>
       <h2>Something went wrong!</h2>
-      <p className="error-msg">{error.message}</p>
-    </>
+      <pre>{error.message}</pre>
+    </article>
   );
 }
