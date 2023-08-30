@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Timer from "@/app/components/App/Timer";
-import AudioPlayer from "@/app/components/App/AudioPlayer";
 import { usePomodoro, useShortcut, useFavicon } from "@/app/hooks";
 import type { Type } from "@/app/hooks/usePomodoro";
 import { formatTime } from "@/app/lib/utils";
+import Looper from "@/app/lib/Looper";
 import {
   isCSSNestingSupported,
   isCSSContainerQueriesSupported,
@@ -65,6 +65,19 @@ export default function App({
   } = usePomodoro({ numberOfPomodoros, lengths });
   const timeLeftInSec = Math.floor(timeLeftFromCurrentSession / 1_000);
 
+  const looperRef = useRef<null | Looper>(null);
+  useEffect(() => {
+    if (!looperRef.current) {
+      looperRef.current = new Looper("/audio/clock.mp3");
+    }
+
+    if (isPlaying && type === "pomodoro") {
+      looperRef.current.play();
+    } else {
+      looperRef.current.stop();
+    }
+  }, [isPlaying, type]);
+
   useEffect(() => {
     const title = formatTime(timeLeftInSec);
     document.title = title;
@@ -103,10 +116,6 @@ export default function App({
       style={{ "--state": isPlaying ? type : null } as React.CSSProperties}
       onClick={handleClick}
     >
-      <AudioPlayer
-        src="/audio/clock.mp3"
-        isPlaying={isPlaying && type === "pomodoro"}
-      />
       <Timer
         {...{
           timeLeftInSec,
