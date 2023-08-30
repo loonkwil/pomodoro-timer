@@ -9,6 +9,7 @@ import { formatTime } from "@/app/lib/utils";
 import {
   isCSSNestingSupported,
   isCSSContainerQueriesSupported,
+  isCSSContainerStyleQueriesSupported,
 } from "@/app/lib/featureDetection";
 
 const colors = {
@@ -42,7 +43,11 @@ export default function App({
   lengths: { pomodoro: number; break: number };
 }) {
   useEffect(() => {
-    if (!isCSSNestingSupported() || !isCSSContainerQueriesSupported()) {
+    const isSupported =
+      isCSSNestingSupported() &&
+      isCSSContainerQueriesSupported() &&
+      isCSSContainerStyleQueriesSupported();
+    if (!isSupported) {
       const msg =
         "Your Browser is not Supported.\n" +
         "Try to use a browser that supports modern CSS features like nesting, cascade layers, container style queries, media query range syntax (Chrome 112+).";
