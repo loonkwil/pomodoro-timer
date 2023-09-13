@@ -93,11 +93,8 @@ export default function App({
   });
 
   const handleInputChange = useCallback(
-    (value: number) => {
-      if (value < numberOfPomodoros) {
-        setCompletedPomodoros(value);
-      }
-    },
+    (value: number) =>
+      setCompletedPomodoros(Math.min(numberOfPomodoros - 1, value)),
     [numberOfPomodoros, setCompletedPomodoros],
   );
 
@@ -114,16 +111,22 @@ export default function App({
     <main
       className="app"
       style={{ "--state": isPlaying ? type : null } as React.CSSProperties}
-      onClick={handleClick}
     >
       <Timer
         {...{
           timeLeftInSec,
           handleInputChange,
+          handleClick,
           numberOfPomodoros,
           completedPomodoros,
         }}
       />
+      <div className="hint" aria-hidden="true">
+        Scroll down for help
+      </div>
+      <div className="announcer" role="status">
+        {timeLeftInSec === 60 ? "1 minutes left" : null}
+      </div>
     </main>
   );
 }

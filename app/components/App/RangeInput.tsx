@@ -8,6 +8,8 @@ export default function RangeInput({
   step = 1,
   precision = 0.001,
   numberOfMarkers = 0,
+  ariaLabel = "",
+  ariaValueText = "",
   onChange,
 }: {
   value: number;
@@ -16,6 +18,8 @@ export default function RangeInput({
   step?: number;
   precision?: number;
   numberOfMarkers: number;
+  ariaLabel?: string;
+  ariaValueText?: string;
   onChange: (value: number) => void;
 }) {
   const roundedValue = roundNearest(value, precision);
@@ -33,6 +37,10 @@ export default function RangeInput({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>): void => {
+      if (e.altKey) {
+        return;
+      }
+
       let nextValue = roundedValue;
       switch (e.key) {
         case "ArrowLeft":
@@ -53,6 +61,12 @@ export default function RangeInput({
           nextValue = Math.min(nextValue, max);
           break;
         }
+        case "Home":
+          nextValue = min;
+          break;
+        case "End":
+          nextValue = max;
+          break;
       }
 
       if (nextValue !== roundedValue) {
@@ -71,6 +85,8 @@ export default function RangeInput({
       value={roundedValue}
       onKeyDown={handleKeyDown}
       onInput={handleInput}
+      aria-label={ariaLabel}
+      aria-valuetext={ariaValueText}
       style={{ "--number-of-markers": numberOfMarkers } as React.CSSProperties}
     />
   );

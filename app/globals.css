@@ -10,11 +10,23 @@
 
     --bg: var(--white);
     --text: var(--black);
+    --outline-color: var(--black);
+
+    @media (prefers-contrast: more) {
+      --black: #000000;
+      --pink: #d47a68;
+      --blue: #08a6a6;
+    }
 
     @media (prefers-color-scheme: dark) {
       --bg: var(--black);
       --text: var(--white);
+      --outline-color: var(--white);
     }
+  }
+
+  :focus-visible {
+    outline: 2px dashed var(--outline-color);
   }
 
   html {
@@ -39,7 +51,14 @@
 
   kbd {
     font-family: inherit;
-    color: var(--pink);
+    border-radius: 0.25rem;
+    color: var(--text);
+    border: 1px solid currentColor;
+    display: inline-block;
+    font-size: 0.85rem;
+    line-height: 1;
+    padding: 0.125rem 0.25rem;
+    white-space: nowrap;
   }
 
   pre {
@@ -49,7 +68,6 @@
 
   article {
     padding: 3rem;
-    text-align: justify;
   }
 }
 
@@ -79,16 +97,7 @@
   .app {
     padding: 1.5rem;
     container-type: inline-size;
-
-    &:after {
-      content: "Scroll down for help";
-      display: grid;
-      height: 1.5rem;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.6rem;
-      animation: 200ms ease-out 5s hide forwards;
-    }
+    position: relative;
   }
 
   .timer {
@@ -98,6 +107,11 @@
     --progress-bar-line-width: 2px;
     --progress-bar-stroke: var(--black);
     --progress-bar-thumb-position: 1; /* 1: at the bottom, 0: on the top */
+    --progress-bar-thumb-animation: 1; /* 1: true, 0: false */
+
+    @media (prefers-reduced-motion) {
+      --progress-bar-thumb-animation: 0;
+    }
 
     @media (prefers-color-scheme: dark) {
       --timer-border: 1px solid var(--white);
@@ -157,6 +171,9 @@
         (var(--thumb-position) * var(--thumb-down)) -
           ((var(--thumb-position) - 1) * var(--thumb-up))
       );
+      --thumb-transition-duration: calc(
+        200ms * var(--progress-bar-thumb-animation)
+      );
 
       appearance: none;
       width: 100%;
@@ -182,6 +199,7 @@
       background-size: calc(100% - (var(--thumb-diameter) - var(--line-width)))
         50%;
       background-repeat: no-repeat;
+      outline-offset: 0.5rem;
     }
 
     /* Firefox */
@@ -200,7 +218,7 @@
           border: none;
           border-radius: 50%;
           background: currentColor;
-          transition: translate 200ms;
+          transition: translate var(--thumb-transition-duration);
           translate: 0 var(--thumb-translate-y);
         }
       }
@@ -218,10 +236,27 @@
           height: var(--thumb-diameter);
           border-radius: 50%;
           background: currentColor;
-          transition: translate 200ms;
+          transition: translate var(--thumb-transition-duration);
           translate: 0 var(--thumb-translate-y);
         }
       }
     }
+  }
+
+  .hint {
+    position: absolute;
+    inset: auto 0 0;
+    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.6rem;
+    animation: 200ms ease-out 5s hide forwards;
+    user-select: none;
+  }
+
+  .announcer {
+    font-size: 0;
+    user-select: none;
   }
 }

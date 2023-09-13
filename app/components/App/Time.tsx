@@ -1,5 +1,5 @@
 import { formatTime } from "@/app/lib/utils";
 
 export default function Time({ timeLeft }: { timeLeft: number }) {
-  return <time>{formatTime(timeLeft)}</time>;
+  return <time role="timer">{formatTime(timeLeft)}</time>;
 }

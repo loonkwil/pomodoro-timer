@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function About() {
   return (
-    <article>
+    <article aria-label="How to use this app">
       <p>
         The Pomodoro Timer app is a time management tool designed to boost
         productivity and focus. It operates on the Pomodoro Technique, a proven

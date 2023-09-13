@@ -10,7 +10,8 @@ export default function useShortcut(shortcuts: Shortcuts) {
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
       const cb = ref.current?.[e.key] as Callback | undefined;
-      if (cb) {
+      if (!e.altKey && cb) {
+        e.preventDefault();
         cb(e);
       }
     };
