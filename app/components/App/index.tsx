@@ -125,7 +125,7 @@ export default function App({
         Scroll down for help
       </div>
       <div className="announcer" role="status">
-        {timeLeftInSec === 60 ? "1 minutes left" : null}
+        {timeLeftInSec === 60 ? "1 minute left" : null}
       </div>
     </main>
   );
